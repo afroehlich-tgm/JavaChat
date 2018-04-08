@@ -36,7 +36,7 @@ public class MainGui extends Thread {
 	}
 
 	private JFrame newFrame = new JFrame("Java Chat Froehlich");
-	private JButton sendMessage, close;
+	private JButton sendMessage;
 	private JTextField messageBox;
 	private JTextArea chatBox;
 	private JFrame preFrame;
@@ -45,16 +45,12 @@ public class MainGui extends Thread {
 	private BufferedReader _reader;
 
 	private Socket mySocket;
-
-	private String username;
 	private ArrayList<String> messages;
 
 	public MainGui() {
 		this.messages = new ArrayList<String>();
-		close = new JButton("Close");
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
-		mainPanel.add(close);
 		JPanel southPanel = new JPanel();
 		southPanel.setBackground(Color.BLUE);
 		southPanel.setLayout(new GridBagLayout());
@@ -64,7 +60,6 @@ public class MainGui extends Thread {
 
 		sendMessage = new JButton("Send Message");
 		sendMessage.addActionListener(new sendMessageButtonListener());
-		close.addActionListener(new closeButton());
 
 		chatBox = new JTextArea();
 		chatBox.setEditable(false);
@@ -121,23 +116,25 @@ public class MainGui extends Thread {
 		preFrame.add(BorderLayout.SOUTH, enterServer);
 		preFrame.setSize(300, 300);
 		preFrame.setVisible(true);
-		
-//Damit alles freigegeben wird beim beenden		
+
+		// Damit alles freigegeben wird beim beenden
 		preFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		preFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-		  @Override
-		  public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		    try {
-		      if(mySocket != null)
-		        mySocket.close();
-		    } catch (IOException e) {
-		      e.printStackTrace();
-		    }
-		    System.exit(0);
-		  }
+			@Override
+			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+				try {
+					if (mySocket != null)
+						mySocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				System.exit(0);
+			}
 		});
 	}
+
 	enterServerButtonListener user = new enterServerButtonListener();
+
 	class sendMessageButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			if (messageBox.getText().length() < 1) {
@@ -145,9 +142,9 @@ public class MainGui extends Thread {
 			} else if (messageBox.getText().equals(".clear")) {
 				chatBox.setText("Cleared all messages\n");
 				messageBox.setText("");
-			} 
-			if(messageBox.getText().length() >= 1){ 
-				_writer.println("<" + user.userName() + ">:  " + messageBox.getText() + "\n");
+			}
+			if (messageBox.getText().length() >= 1) {
+				_writer.println("<" + user.userName() + ">:  " + messageBox.getText());
 				messageBox.setText("");
 			}
 			messageBox.requestFocusInWindow();
@@ -155,13 +152,13 @@ public class MainGui extends Thread {
 	}
 
 	class enterServerButtonListener implements ActionListener {
-		public String userName(){
+		public String userName() {
 			String username = usernameChooser.getText();
 			return username;
 		}
-		
+
 		public void actionPerformed(ActionEvent event) {
-			try{
+			try {
 				System.out.println(userName());
 				if (userName().length() < 1) {
 					System.out.println("No!");
@@ -188,7 +185,7 @@ public class MainGui extends Thread {
 				System.out.println("Verbunden: " + mySocket.isConnected());
 				_writer = new PrintWriter(mySocket.getOutputStream(), true);
 				_reader = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
-				_writer.println("Hello!");
+				_writer.println("Client Connected!\n");
 				while (true) {
 					String message = _reader.readLine();
 
@@ -197,30 +194,12 @@ public class MainGui extends Thread {
 
 					} else {
 						messages.add(message);
-						chatBox.append(message+"\n");
+						chatBox.append(message + "\n");
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-	}
-
-	class closeButton implements ActionListener {
-		public void actionPerformed(ActionEvent event) {
-			MainGui g = new MainGui();
-			Runtime.getRuntime().addShutdownHook(new Thread() {
-				@Override
-				public void run() {
-					try {
-						g.mySocket.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
-
 		}
 	}
 
