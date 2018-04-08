@@ -38,33 +38,47 @@ public class MainGui extends Thread {
 	private JFrame newFrame = new JFrame("Java Chat Froehlich");
 	private JButton sendMessage;
 	private JTextField messageBox;
-	private JTextArea chatBox;
+	private JTextArea chatBox, clientList;
 	private JFrame preFrame;
 	private JTextField usernameChooser;
 	private PrintWriter _writer;
 	private BufferedReader _reader;
-
 	private Socket mySocket;
 	private ArrayList<String> messages;
+	private ArrayList<String> names;
+
 
 	public MainGui() {
 		this.messages = new ArrayList<String>();
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 		JPanel southPanel = new JPanel();
+		JPanel eastPanel = new JPanel();
 		southPanel.setBackground(Color.BLUE);
 		southPanel.setLayout(new GridBagLayout());
+		eastPanel.setBackground(Color.BLUE);
+		eastPanel.setLayout(new BorderLayout());
+		
+		//TEXTAREA FÜR ALLE CLIENTS
+		clientList = new JTextArea();
+		clientList.setEditable(false);
+		clientList.setFont(new Font("Serif", Font.PLAIN, 15));
+		clientList.setLineWrap(true);
 
+		eastPanel.add(clientList, BorderLayout.LINE_END);
 		messageBox = new JTextField(30);
 		messageBox.requestFocusInWindow();
-
 		sendMessage = new JButton("Send Message");
 		sendMessage.addActionListener(new sendMessageButtonListener());
+
 
 		chatBox = new JTextArea();
 		chatBox.setEditable(false);
 		chatBox.setFont(new Font("Serif", Font.PLAIN, 15));
 		chatBox.setLineWrap(true);
+
+		
+
 
 		mainPanel.add(new JScrollPane(chatBox), BorderLayout.CENTER);
 
@@ -85,10 +99,10 @@ public class MainGui extends Thread {
 		southPanel.add(sendMessage, right);
 
 		mainPanel.add(BorderLayout.SOUTH, southPanel);
-
+		mainPanel.add(BorderLayout.EAST, eastPanel);
 		newFrame.add(mainPanel);
 		newFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		newFrame.setSize(470, 300);
+		newFrame.setSize(500, 300);
 		newFrame.setVisible(true);
 	}
 
@@ -150,11 +164,13 @@ public class MainGui extends Thread {
 		}
 	}
 
+
 	class enterServerButtonListener implements ActionListener {
 		public String userName() {
 			String username = usernameChooser.getText();
 			return username;
 		}
+		
 
 		public void actionPerformed(ActionEvent event) {
 			try {
@@ -184,7 +200,7 @@ public class MainGui extends Thread {
 				System.out.println("Verbunden: " + mySocket.isConnected());
 				_writer = new PrintWriter(mySocket.getOutputStream(), true);
 				_reader = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
-				_writer.println("Client Connected!\n");
+				_writer.println(usernameChooser.getText() + " Connected!");
 				while (true) {
 					String message = _reader.readLine();
 
