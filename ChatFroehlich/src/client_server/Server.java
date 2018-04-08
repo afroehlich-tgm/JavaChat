@@ -15,8 +15,7 @@ import java.util.Collections;
 public class Server {
     private ServerSocket serverSocket;
     private List<String> messages;
-	List<PrintWriter> clients;
-
+	ArrayList <PrintWriter> clients;
     
     public static void main(String[] args) throws Exception {
 		Server s = new Server();
@@ -24,10 +23,9 @@ public class Server {
 	}
    
     public Server() throws Exception {
-		clients = new ArrayList<PrintWriter>();
         // Um Socketverbindung zu erstellen
         this.serverSocket = new ServerSocket(5050, 8);
-
+        clients = new ArrayList<PrintWriter>();
         // Synchronized ArrayList wird hier erstellt
         // Synchronized bedeutet einfach Thread-Safe
         this.messages = Collections.synchronizedList(new ArrayList<String>());
@@ -40,7 +38,7 @@ public class Server {
             	Socket clientSocket = serverSocket.accept();
             	serverSocket.setReuseAddress(true);
                 // Erstellt zu einem Client einen neuen zuständigen Thread
-                new ServerThread(clientSocket, this.messages).start();
+                new ServerThread(clientSocket, this.messages, clients).start();
             } catch (Exception e) {
                 e.printStackTrace();
                 break;
