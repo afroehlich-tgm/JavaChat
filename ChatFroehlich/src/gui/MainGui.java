@@ -118,7 +118,6 @@ public class MainGui extends Thread {
 		preFrame.setVisible(true);
 
 		// Damit alles freigegeben wird beim beenden
-		preFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		preFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
